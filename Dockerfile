@@ -20,4 +20,5 @@ RUN apt-get update && \
     docker-php-ext-install intl && \
     docker-php-ext-install xml && \
     docker-php-ext-install pdo_mysql && \
+    chmod 777 /var/www/html/app/inc && \
     chmod 777 /var/www/html/tpl_c
