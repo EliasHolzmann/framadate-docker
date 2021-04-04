@@ -1,0 +1,16 @@
+image: bartim/framadate:latest
+manifests:
+  - image: bartim/framadate:amd64
+    platform:
+      architecture: amd64
+      os: linux
+  - image: bartim/framadate:arm32v7
+    platform:
+      architecture: arm
+      os: linux
+      variant: v7
+  - image: bartim/framadate:arm64v8
+    platform:
+      architecture: arm64
+      os: linux
+      variant: v8

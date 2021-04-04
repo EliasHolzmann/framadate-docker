@@ -1,0 +1,31 @@
+FROM alpine AS builder
+
+# Download QEMU, see https://github.com/docker/hub-feedback/issues/1261
+ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz
+RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
+
+FROM composer:latest as untar
+ARG FRAMADATE_VERSION=1.1.16
+RUN apk add --no-cache wget
+RUN wget -O framadata.tar.bz2 "https://framagit.org/framasoft/framadate/framadate/-/archive/${FRAMADATE_VERSION}/framadate-${FRAMADATE_VERSION}.tar.bz2" && \
+    tar xjf framadata.tar.bz2 && \
+    cd "framadate-${FRAMADATE_VERSION}" && \
+    composer install && \
+    cd ..
+
+FROM arm32v7/php:apache
+# Add QEMU
+COPY --from=builder qemu-arm-static /usr/bin
+
+ARG FRAMADATE_VERSION=1.1.16
+COPY --from=untar "/app/framadate-${FRAMADATE_VERSION}" /var/www/html
+
+RUN apt-get update && \
+    apt-get install -y libonig-dev libicu-dev libxml2-dev && \
+    rm -rf /var/lib/apt/lists/* && \
+    \
+    docker-php-ext-install mbstring && \
+    docker-php-ext-install intl && \
+    docker-php-ext-install xml && \
+    docker-php-ext-install pdo_mysql && \
+    chmod 777 /var/www/html/tpl_c
