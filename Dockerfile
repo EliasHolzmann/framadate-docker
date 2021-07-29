@@ -22,3 +22,7 @@ RUN apt-get update && \
     docker-php-ext-install pdo_mysql && \
     chmod 777 /var/www/html/app/inc && \
     chmod 777 /var/www/html/tpl_c
+    
+# Adding .htaccess rules
+RUN cp /var/www/html/htaccess.txt /var/www/html/.htaccess && \
+    a2enmod rewrite
